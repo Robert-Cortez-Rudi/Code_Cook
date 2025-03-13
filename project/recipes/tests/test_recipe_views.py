@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
 from project.recipes.views import home, category, recipe
-
+from project.recipes.models import Category, Recipe, User
 
 class RecipeHomeViewTest(TestCase):
     def test_recipe_home_view_function_is_correct(self):
@@ -23,7 +23,38 @@ class RecipeHomeViewTest(TestCase):
             response.content.decode("utf-8") 
         )
 
+    def test_recipe_home_template_loads_recipes(self):
+        category = Category.objects.create(name="Category")
+        author = User.objects.create_user(
+            first_name = "firstname",
+            last_name = "last_name",
+            username = "username",
+            password = "123456",
+            email = "username@email.com"
+        )
+        recipe = Recipe.objects.create(
+            category = category,
+            author = author,
+            title = "Recipe title",
+            description = "Recipe Description",
+            slug = "recipe-slug",
+            preparation_time = 10,
+            preparation_time_unit = "Minutos",
+            servings = 5,
+            servings_unit = "Porções",
+            preparation_steps = "Recipe preparation steps",
+            preparation_steps_is_html = False,
+            is_published = True
+        )
+        response = self.client.get(reverse("codecook:home"))
+        content = response.content.decode("UTF-8")
+        response_recipe = response.context["recipes"]
 
+        self.assertIn("Recipe title", content)
+        self.assertIn("10 Minutos", content)
+        self.assertIn("5 Porções", content)
+        self.assertEqual(len(response_recipe), 1)
+        ...
 
 class RecipeCategoryViewTest(TestCase):
     def test_recipe_category_view_function_is_correct(self):
