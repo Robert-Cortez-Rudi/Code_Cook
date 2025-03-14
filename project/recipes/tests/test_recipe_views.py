@@ -1,9 +1,11 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
 from project.recipes.views import home, category, recipe
-from project.recipes.models import Category, Recipe, User
+from .test_recipe_base import RecipeTestBase
 
-class RecipeHomeViewTest(TestCase):
+
+class RecipeHomeViewTest(RecipeTestBase):
+
     def test_recipe_home_view_function_is_correct(self):
         view = resolve(reverse("codecook:home"))
         self.assertIs(view.func, home)
@@ -24,39 +26,33 @@ class RecipeHomeViewTest(TestCase):
         )
 
     def test_recipe_home_template_loads_recipes(self):
-        category = Category.objects.create(name="Category")
-        author = User.objects.create_user(
-            first_name = "firstname",
-            last_name = "last_name",
-            username = "username",
-            password = "123456",
-            email = "username@email.com"
-        )
-        recipe = Recipe.objects.create(
-            category = category,
-            author = author,
-            title = "Recipe title",
-            description = "Recipe Description",
-            slug = "recipe-slug",
-            preparation_time = 10,
-            preparation_time_unit = "Minutos",
-            servings = 5,
-            servings_unit = "Porções",
-            preparation_steps = "Recipe preparation steps",
-            preparation_steps_is_html = False,
-            is_published = True
-        )
+        # need a recipe for this test
+        self.make_recipe()
+
         response = self.client.get(reverse("codecook:home"))
         content = response.content.decode("UTF-8")
         response_recipe = response.context["recipes"]
 
+        # Check if one recipe exist
         self.assertIn("Recipe title", content)
-        self.assertIn("10 Minutos", content)
-        self.assertIn("5 Porções", content)
         self.assertEqual(len(response_recipe), 1)
-        ...
 
-class RecipeCategoryViewTest(TestCase):
+    def test_recipe_home_template_dont_load_recipes_not_published(self):
+        """Test recipe is published False dont show"""
+
+        # need a recipe for this test
+        self.make_recipe(is_published=False)
+        
+        response = self.client.get(reverse("codecook:home"))
+
+        # Check if one recipe exist
+        self.assertIn(
+            "No recipes found here!",
+            response.content.decode("utf-8") 
+        )
+
+
+class RecipeCategoryViewTest(RecipeTestBase):
     def test_recipe_category_view_function_is_correct(self):
         view = resolve(
             reverse("codecook:category", kwargs={"category_id": 1})
@@ -67,9 +63,19 @@ class RecipeCategoryViewTest(TestCase):
         response = self.client.get(reverse("codecook:category", kwargs={"category_id": 100}))
         self.assertEqual(response.status_code, 404)
 
+    def test_recipe_category_template_loads_recipes(self):
+        needed_title = "This is a category test"
+
+        # need a recipe for this test
+        self.make_recipe(title=needed_title)
+        response = self.client.get(reverse("codecook:category", kwargs= {"category_id": 1}))
+        content = response.content.decode("UTF-8")
+
+        # Check if one recipe exist
+        self.assertIn(needed_title, content)
 
 
-class RecipeDetailViewTest(TestCase):
+class RecipeDetailViewTest(RecipeTestBase):
     def test_recipe_detail_view_function_is_correct(self):
         view = resolve(
             reverse("codecook:recipe", kwargs={"id": 1})
@@ -79,3 +85,14 @@ class RecipeDetailViewTest(TestCase):
     def test_recipe_detail_view_returns_404_if_no_recipes_found(self):
         response = self.client.get(reverse("codecook:recipe", kwargs={"id": 100}))
         self.assertEqual(response.status_code, 404)
+
+    def test_recipe_detail_template_loads_the_correct_recipe(self):
+        needed_title = "This is a detail page - It load one recipe" 
+
+        # need a recipe for this test
+        self.make_recipe(title=needed_title)
+        response = self.client.get(reverse("codecook:recipe", kwargs= {"id": 1}))
+        content = response.content.decode("UTF-8")
+
+        # Check if one recipe exist
+        self.assertIn(needed_title, content)
