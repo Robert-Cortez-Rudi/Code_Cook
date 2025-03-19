@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse, resolve
-from project.recipes.views import home, category, recipe
+from project.recipes.views import home, category, recipe, search
 from .test_recipe_base import RecipeTestBase
 
 
@@ -117,3 +117,14 @@ class RecipeDetailViewTest(RecipeTestBase):
         response = self.client.get(reverse("codecook:recipe", kwargs={"id": recipe.id}))
 
         self.assertEqual(response.status_code, 404)
+
+
+
+class RecipeSearchViewTest(RecipeTestBase):
+    def test_recipe_search_uses_correct_view_function(self): 
+        resolved = resolve(reverse("codecook:search")) 
+        self.assertIs(resolved.func, search)
+
+    def test_recipe_search_loads_correct_template(self):
+        response = self.client.get(reverse("codecook:search"))
+        self.assertTemplateUsed(response, "recipes/pages/search.html")
