@@ -13,7 +13,7 @@ class RecipeModelTest(RecipeTestBase):
             author = self.make_author(username="User test"),
             title = "Recipe title",
             description = "Recipe Description",
-            slug = "recipe-slug",
+            slug = "test-slug",
             preparation_time = 10,            
             preparation_time_unit = "Minutos",
             servings = 5,
