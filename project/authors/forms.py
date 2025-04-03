@@ -28,37 +28,40 @@ class RegisterForm(forms.ModelForm):
         add_placeholder(self.fields["email"], "Your e-mail")
         add_placeholder(self.fields["first_name"], "Ex.: Robert")
         add_placeholder(self.fields["last_name"], "Ex.: Rudi")
+        add_placeholder(self.fields["password"], "Type your password")
+        add_placeholder(self.fields["password2"], "Repeat your password")
 
     password = forms.CharField(
-        widget= forms.PasswordInput(attrs={
-            "placeholder": "Your password"
-        }),
+        label="Password",
+        required= True,
+        widget= forms.PasswordInput(),
         error_messages= {
             "required": "Password must not be empty"
         },
         help_text= (
-            "Password must have at least one uppercase letter, one lowercase letter and one number. ",
-            "The length should be at least 8 characters."
+            "Password must have at least one uppercase letter, "
+            "one lowercase letter and one number. "
+            "The length should be at least 8 characters."   
         ),
         validators= [strong_password]
     )
 
-    password2 = forms.CharField(widget=forms.PasswordInput(attrs={
-        "placeholder": "Repeat your password"
-    }))
+    password2 = forms.CharField(
+        label="Password2",
+        required= True,
+        widget=forms.PasswordInput()
+    )
 
     
 
     class Meta:
         model = User
         fields = ["first_name", "last_name", "username", "email", "password"]
-        # exclude = ["username"]
         labels = {
             "username": "Username",
             "first_name": "First Name",
             "last_name": "Last Name",
             "email": "E-mail",
-            "password": "Password"
         }
         help_texts = {
             "email": "The e-mail must be valid"
@@ -67,15 +70,6 @@ class RegisterForm(forms.ModelForm):
             "username": {
                 "required": "This field must be required"
             }
-        }
-        widgets = {
-            "first_name": forms.TextInput(attrs= {
-                "placeholder": "Type your username here", 
-                "class": "text-input"
-            }),
-            "password": forms.PasswordInput(attrs= {
-                "placeholder": "Type your password here"
-            })
         }
     
     def clean(self):
