@@ -31,9 +31,39 @@ class RegisterForm(forms.ModelForm):
         add_placeholder(self.fields["password"], "Type your password")
         add_placeholder(self.fields["password2"], "Repeat your password")
 
+    username = forms.CharField(
+        label="Username",
+        help_text=(
+            "Username must have letters, numbers or one of those @.+-_. "
+            "The length should be between 4 and 150 characters."
+        ),
+        error_messages={
+            "required": "This field must not be empty",
+            "min_length": "Username must have at least 4 characters",
+            "max_length": "Username must have less then 150 characters"
+        },
+        min_length=4,
+        max_length=150
+    )
+
+    first_name = forms.CharField(
+        error_messages= {"required": "Write your first name"},
+        label="First Name"
+    )
+
+    last_name = forms.CharField(
+        error_messages= {"required": "Write your last name"},
+        label="Last Name"
+    )
+
+    email = forms.EmailField(
+        label="E-mail",
+        error_messages= {"required" : "E-mail is required"},
+        help_text = "The e-mail must be valid"
+    )
+
     password = forms.CharField(
         label="Password",
-        required= True,
         widget= forms.PasswordInput(),
         error_messages= {
             "required": "Password must not be empty"
@@ -48,29 +78,18 @@ class RegisterForm(forms.ModelForm):
 
     password2 = forms.CharField(
         label="Password2",
-        required= True,
-        widget=forms.PasswordInput()
+        widget=forms.PasswordInput(),
+        error_messages= {
+            "required": "Please repeat your password"
+        }
     )
 
-    
 
     class Meta:
         model = User
         fields = ["first_name", "last_name", "username", "email", "password"]
-        labels = {
-            "username": "Username",
-            "first_name": "First Name",
-            "last_name": "Last Name",
-            "email": "E-mail",
-        }
-        help_texts = {
-            "email": "The e-mail must be valid"
-        }
-        error_messages = {
-            "username": {
-                "required": "This field must be required"
-            }
-        }
+        
+        
     
     def clean(self):
         cleaned_data = super().clean()
