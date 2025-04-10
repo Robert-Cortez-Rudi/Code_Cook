@@ -9,7 +9,7 @@ def add_attrs(field, attr_name, attr_new_val):
 
 
 def add_placeholder(field, placeholder_val):
-    field.widget.attrs["placeholder"] = f"{placeholder_val}".strip()
+    add_attrs(field, 'placeholder', placeholder_val)
 
 
 def strong_password(password):
