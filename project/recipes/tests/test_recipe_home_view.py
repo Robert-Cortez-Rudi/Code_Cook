@@ -64,3 +64,17 @@ class RecipeHomeViewTest(RecipeTestBase):
         self.assertEqual(len(paginator.get_page(1)), 3)
         self.assertEqual(len(paginator.get_page(2)), 3)
         self.assertEqual(len(paginator.get_page(3)), 2)
+
+
+    @patch("project.recipes.views.PER_PAGE", new=3)
+    def test_invalid_page_query_uses_page_one(self):
+        for i in range(8):
+            kwargs = {"author_data": {"username": f"username {i}"}, "slug": f"slug {i}"}
+            self.make_recipe(**kwargs)
+
+        response = self.client.get(reverse("codecook:home") + "?page=1A")
+        self.assertEqual(response.context["recipes"].number, 1)  
+
+        response = self.client.get(reverse("codecook:home") + "?page=2")
+        self.assertEqual(response.context["recipes"].number, 2)    
+
