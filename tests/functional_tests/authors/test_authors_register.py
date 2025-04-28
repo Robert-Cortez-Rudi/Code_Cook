@@ -1,16 +1,10 @@
 from .base import AuthorsBaseTest
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+import pytest
 
-
+@pytest.mark.functional_test
 class AuthorsRegisterTest(AuthorsBaseTest):
-    def get_by_id(self, web_element, id):
-        return web_element.find_element(
-            By.XPATH,
-            id
-        )
-
-
     def fill_form_dummy_data(self, form):
         fields = form.find_elements(By.TAG_NAME, "input")
 
