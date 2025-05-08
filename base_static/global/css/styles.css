@@ -63,6 +63,10 @@
     font-family: var(--font-headings);
   }
   
+  img {
+    max-width: 100%;
+  }
+
   .main-header-container {
     background: var(--color-primary-dark);
   }
@@ -442,6 +446,11 @@
   .recipe-title {
     text-decoration: none;
     color: var(--color-debug-dark);
+  }
+
+  .plaintext-link {
+    color: var(--color-primary);
+    text-decoration: none;
   }
 
   /* Generics */
