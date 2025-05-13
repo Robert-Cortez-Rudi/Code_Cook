@@ -5,8 +5,38 @@ from django.core.paginator import Paginator
 from utils.pagination import make_pagination
 from .models import Recipe
 import os
+from django.views.generic import ListView
 
 PER_PAGE = int(os.environ.get("PER_PAGE", 9))
+
+
+class RecipeListViewBase(ListView):
+    model = Recipe
+    paginate_by = None
+    context_object_name = "recipes"
+    ordering = ["-id"]
+    template_name = "recipes/pages/home.html"
+
+    def get_queryset(self, *args, **kwargs):
+        query_set =  super().get_queryset(*args, **kwargs)
+        query_set = query_set.filter(is_published=True)
+
+        return query_set
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        page_object, pagination_range = make_pagination(self.request, context.get("recipes"), PER_PAGE)
+        context.update({
+            "recipes": page_object,
+            "pagination_range": pagination_range
+        })
+
+        return context
+
+
+class RecipeListViewHome(RecipeListViewBase):
+    template_name = "recipes/pages/home.html"
+
 
 def home(request):
     recipes = Recipe.objects.filter(is_published=True).order_by("-id")
