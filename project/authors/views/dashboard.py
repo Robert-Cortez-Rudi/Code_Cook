@@ -26,8 +26,6 @@ def dashboard(request):
 )
 class DashboardRecipe(View):
     def get_recipe(self, id=None):
-        recipe = None
-
         if id is not None:
             recipe = Recipe.objects.filter(
                 pk=id,
@@ -35,10 +33,11 @@ class DashboardRecipe(View):
                 author=self.request.user
             ).first()
 
-        if not recipe:
-            raise Http404()
-        
-        return recipe
+            if not recipe:
+                raise Http404()
+            
+            return recipe
+        return None
 
 
     def render_recipe(self, form):
